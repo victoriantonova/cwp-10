@@ -35,7 +35,7 @@ function ValidCreate(req) {
     if (req.body.title !== undefined && req.body.rating !== undefined && req.body.rating > 0 && req.body.year !== undefined
         && req.body.budget !== undefined && req.body.gross !== undefined && req.body.poster !== undefined && req.body.position !== undefined
         && req.body.year > 0 && req.body.budget > 0 && req.body.gross > 0 && req.body.position > 0)
-        return true;
+    return true;
     else
         return false;
 }
@@ -76,7 +76,6 @@ function ExistID(id) {
     })
 }
 
-
 app.post('/update', (req, res) => {
     ExistID(req.body.id).then(
         exist => {
@@ -112,11 +111,24 @@ app.post('/update', (req, res) => {
     fs.writeFile("top250.json", JSON.stringify(films), "utf8", function () {});
 });
 
-
-//
-// app.get('/', (req, res) => {
-//     res.send('Hello World!');
-// });
+app.post('/delete', (req, res) => {
+    ExistID(req.body.id).then(
+        exist => {
+            let k = films[films.findIndex(film => film.id === req.body.id)].position;
+            films.splice(films.findIndex(film => film.id === req.body.id), 1);
+            for (let i = 0; i < films.length-1; i++) {
+                if(films[i].position > k) {
+                    films[i].position--;
+                }
+            }
+            fs.writeFile("top250.json", JSON.stringify(films), "utf8", function () {});
+            RefreshPosition();
+            res.send(All());
+        },
+        error => {
+            res.send("{code: 404, message: Not found");
+        });
+});
 
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
