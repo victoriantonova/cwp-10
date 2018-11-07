@@ -26,6 +26,11 @@ app.get('/readAll', (req, res) => {
     res.send(All());
 });
 
+
+app.post('/read', (req, res) => {
+    res.send(films[films.findIndex(film => film.id === req.body.id)]);
+});
+
 //
 // app.get('/', (req, res) => {
 //     res.send('Hello World!');
