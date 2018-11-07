@@ -61,6 +61,57 @@ app.post('/create', (req, res) => {
     }
 });
 
+function ExistID(id) {
+    return new Promise((resolve, reject) => {
+        let exist = 0;
+        for (i = 0; i < films.length; i++) {
+            if (films[i].id === id) {
+                resolve("exist");
+                exist = 1;
+            }
+            if (i === films.length && exist === 0) {
+                reject("error");
+            }
+        }
+    })
+}
+
+
+app.post('/update', (req, res) => {
+    ExistID(req.body.id).then(
+        exist => {
+            for (let i = 0; i < films.length; i++) {
+                if (films[i].id === req.body.id) {
+                    if (req.body.title !== undefined)
+                        films[i].title = req.body.title;
+                    if (req.body.rating !== undefined && req.body.rating > 0)
+                        films[i].rating = req.body.rating;
+                    if (req.body.year !== undefined && req.body.year > 0)
+                        films[i].year = req.body.year;
+                    if (req.body.budget !== undefined && req.body.budget >= 0)
+                        films[i].budget = req.body.budget;
+                    if (req.body.gross !== undefined && req.body.gross >= 0)
+                        films[i].gross = req.body.gross;
+                    if (req.body.poster !== undefined)
+                        films[i].poster = req.body.poster;
+                    if (req.body.position !== undefined && req.body.position > 0) {
+                        for (let j = 0; j < films.length; j++) {
+                            if(films[j].position >= req.body.position) {
+                                films[j].position++;
+                            }
+                        }
+                        films[i].position = req.body.position;
+                    }
+                }
+            }
+            res.send(All());
+        },
+        error => {
+            res.send("{code: 404, message: Not found");
+        });
+    fs.writeFile("top250.json", JSON.stringify(films), "utf8", function () {});
+});
+
 
 //
 // app.get('/', (req, res) => {
